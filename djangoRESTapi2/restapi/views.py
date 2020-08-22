@@ -26,16 +26,13 @@ def specificUserDetails(request, user_id):
 def generateJWT(req_un, req_pass):
     exp_time = datetime.datetime.now() + datetime.timedelta(hours=1)
     JWT_PAYLOAD = {
-        "context": {
-            "user": {
-                "password": req_pass,
-                "username": req_un,
-            },
-            "iss": "My ISS",
-            "exp": int(exp_time.timestamp()),
-            "iat": int(datetime.datetime.now().timestamp()),
-        }
+        "user": {
+            "password": req_pass,
+            "username": req_un,
+        },
+        "exp": int(exp_time.timestamp()),
     }
+
     jwt_token = jwt.encode(JWT_PAYLOAD, 'secret', algorithm='HS256')
     return jwt_token
 
@@ -61,9 +58,23 @@ def loginAndGenerateJWT(request):
             r = request.post(
                 "https://encrusxqoan0b.x.pipedream.net/", data=json.dumps(payload)
             )
+        print(decoded)
         return JsonResponse({"token": token, "success": "true"})
     else:
         return JsonResponse({"success": "false"})
+
+
+@csrf_exempt
+def login(request):
+    data = json.loads(request.body.decode('utf-8'))
+    token = data['token']
+    usr = data['username']
+    pas = data['password']
+    decoded = jwt.decode(token, 'secret', algorithms='HS256')
+    if decoded['user']['password'] == pas and decoded['user']['username'] == usr and int(decoded['exp']) <= int(datetime.datetime.now().timestamp()):
+        return JsonResponse({"login-success": "true"})
+    else:
+        return JsonResponse({"login-success": "false"})
 
 
 @csrf_exempt
