@@ -14,6 +14,12 @@ class AllUsersDetails(View):
         return JsonResponse(detail_list, safe=False)
 
 
+def specificUserDetails(request, user_id):
+    # req_object=json.loads(request.body.decode('utf-8'))
+    print(User.objects.get(id=user_id))
+    return JsonResponse({"username": User.objects.get(id=user_id).username})
+
+
 @csrf_exempt
 def register(request):
     req_object = (json.loads(request.body.decode('utf-8')))
