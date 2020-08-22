@@ -39,3 +39,21 @@
         "password" : "<password>"
 
     }
+
+-   <u>To login using received JWT</u>:
+
+    Send a JSON POST to:
+
+    http://localhost:8000/users-api/jwt-auth/login
+
+    <details>
+    <summary>JSON POST format</summary>
+    {
+
+        "username" : "<username>",
+
+        "password" : "<password>",
+
+        "token" : "<token>"
+
+    }
