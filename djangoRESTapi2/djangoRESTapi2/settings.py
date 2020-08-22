@@ -25,7 +25,7 @@ SECRET_KEY = 's(7*kaf=w@-s3umz)#yw0wly5$^8_b#o&t(b^ur=6&&y)#@tsq'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -37,9 +37,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'restapi'
+    'restapi',
+    'rest_framework'
 ]
-
+# CSRF_COOKIE_SECURE = True
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
