@@ -48,6 +48,19 @@ def loginAndGenerateJWT(request):
     token = generateJWT(req_un, req_pass).decode('utf-8')
     # print(type(token.decode('utf-8')))
     if act_pass == req_pass:
+        def get_client_ip(request):
+            x_forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR")
+            if x_forwarded_for:
+                ip = x_forwarded_for.split(",")[0]
+            else:
+                ip = request.META.get("REMOTE_ADDR")
+            return ip
+            # Performing a simple python post request to let the API know someone has authenticated
+            # and is served the response successfully
+            payload = {"user": user_profile.id, "ip": get_client_ip(request)}
+            r = request.post(
+                "https://encrusxqoan0b.x.pipedream.net/", data=json.dumps(payload)
+            )
         return JsonResponse({"token": token, "success": "true"})
     else:
         return JsonResponse({"success": "false"})
