@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.views import View
 from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
+from django.conf import settings
 import json
 # Create your views here.
 
@@ -22,25 +23,34 @@ def specificUserDetails(request, user_id):
     return JsonResponse({"username": User.objects.get(id=user_id).username})
 
 
-def generateJWT():
+def generateJWT(req_un, req_pass):
     exp_time = datetime.datetime.now() + datetime.timedelta(hours=1)
     JWT_PAYLOAD = {
         "context": {
             "user": {
-                "id": "My Name",
-                "username": "My Email",
+                "password": req_pass,
+                "username": req_un,
             },
             "iss": "My ISS",
             "exp": int(exp_time.timestamp()),
             "iat": int(datetime.datetime.now().timestamp()),
         }
     }
-    jwt_token = jwt.encode(JWT_PAYLOAD, settings.JWT_SECRET, algorithm='HS256')
+    jwt_token = jwt.encode(JWT_PAYLOAD, 'secret', algorithm='HS256')
+    return jwt_token
 
 
 @csrf_exempt
 def loginAndGenerateJWT(request):
-    pass
+    req_un = json.loads(request.body.decode('utf-8'))['username']
+    req_pass = json.loads(request.body.decode('utf-8'))['password']
+    act_pass = User.objects.get(username=req_un).password
+    token = generateJWT(req_un, req_pass).decode('utf-8')
+    # print(type(token.decode('utf-8')))
+    if act_pass == req_pass:
+        return JsonResponse({"token": token, "success": "true"})
+    else:
+        return JsonResponse({"success": "false"})
 
 
 @csrf_exempt
