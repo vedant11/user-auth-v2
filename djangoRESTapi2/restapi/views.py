@@ -6,6 +6,8 @@ import json
 # Create your views here.
 
 from .models import User
+import jwt
+import datetime
 
 
 class AllUsersDetails(View):
@@ -18,6 +20,27 @@ def specificUserDetails(request, user_id):
     # req_object=json.loads(request.body.decode('utf-8'))
     print(User.objects.get(id=user_id))
     return JsonResponse({"username": User.objects.get(id=user_id).username})
+
+
+def generateJWT():
+    exp_time = datetime.datetime.now() + datetime.timedelta(hours=1)
+    JWT_PAYLOAD = {
+        "context": {
+            "user": {
+                "id": "My Name",
+                "username": "My Email",
+            },
+            "iss": "My ISS",
+            "exp": int(exp_time.timestamp()),
+            "iat": int(datetime.datetime.now().timestamp()),
+        }
+    }
+    jwt_token = jwt.encode(JWT_PAYLOAD, settings.JWT_SECRET, algorithm='HS256')
+
+
+@csrf_exempt
+def loginAndGenerateJWT(request):
+    pass
 
 
 @csrf_exempt
