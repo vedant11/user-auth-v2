@@ -12,9 +12,17 @@ import datetime
 
 
 class AllUsersDetails(View):
+    # Authorisation
     def get(self, request):
-        detail_list = list(User.objects.values())
-        return JsonResponse(detail_list, safe=False)
+        # Authorized
+        token=request.META(['Authorization'])
+        decoded_token=json.load(jwt.decode(token, 'secret', algorithms=['HS256']))
+        auth_res=decoded_token['resource']
+        if auth_res=='Authorized':
+            detail_list = list(User.objects.values())
+            return JsonResponse(detail_list, safe=False)
+        else:
+            return JsonResponse({"authorized":"false"})
 
 
 def specificUserDetails(request, user_id):
@@ -32,7 +40,6 @@ def generateJWT(req_un, req_pass):
         },
         "exp": int(exp_time.timestamp()),
     }
-
     jwt_token = jwt.encode(JWT_PAYLOAD, 'secret', algorithm='HS256')
     return jwt_token
 
@@ -58,7 +65,7 @@ def loginAndGenerateJWT(request):
             r = request.post(
                 "https://encrusxqoan0b.x.pipedream.net/", data=json.dumps(payload)
             )
-        print(decoded)
+        # print(decoded)
         return JsonResponse({"token": token, "success": "true"})
     else:
         return JsonResponse({"success": "false"})
